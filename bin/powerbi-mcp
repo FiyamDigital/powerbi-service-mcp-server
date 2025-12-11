@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+// Placeholder CLI entrypoint for MCP mode.
+
+// Base44 will replace this with command-line logic.
+console.log("Running powerbi-mcp placeholder CLI...");

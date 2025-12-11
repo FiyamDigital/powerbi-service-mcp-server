@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  powerbi-mcp-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: powerbi-mcp-api
+
+    ports:
+      - "3000:3000"
+
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      TENANT_ID: ${TENANT_ID}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      PBI_SCOPE: ${PBI_SCOPE:-https://analysis.windows.net/powerbi/api/.default}
+      PBI_AUTH_MODE: ${PBI_AUTH_MODE:-sp}
+      API_KEY: ${API_KEY}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      WORKDIR: /app/temp
+      CORS_ORIGINS: ${CORS_ORIGINS:-*}
+
+    volumes:
+      - ./temp:/app/temp
+      - ./logs:/app/logs
+
+    restart: unless-stopped
+
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+    networks:
+      - powerbi-network
+
+networks:
+  powerbi-network:
+    driver: bridge
